@@ -82,6 +82,7 @@ func getDetails(keyspace string) (c Cassandraspec, e error) {
 	if err != nil {
 		fmt.Println(err)
 	}
+        defer db.Close()
 	stmt, err := db.Prepare("select username, password from provision where name = $1 ")
 	if err != nil {
 		fmt.Println(err)
@@ -113,6 +114,7 @@ func store(keyspace string, billingcode string, plan string, username string, pa
 		fmt.Println(err)
 		return err
 	}
+        defer db.Close()
 	var newname string
 	err = db.QueryRow("INSERT INTO provision(name, plan, claimed, billingcode,username,password) VALUES($1,$2,$3,$4,$5,$6) returning name;", keyspace, plan, "yes", billingcode, username, password).Scan(&newname)
 
@@ -164,6 +166,7 @@ func delete(keyspace string) error {
 		fmt.Println(err)
 		return err
 	}
+        defer db.Close()
 	stmt, err := db.Prepare("DELETE from  provision where name = $1")
 	if err != nil {
 		fmt.Println(err)
